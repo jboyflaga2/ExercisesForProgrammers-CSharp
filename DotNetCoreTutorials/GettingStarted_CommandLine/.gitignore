@@ -1,8 +1,0 @@
-# this gitignore is from https://github.com/dotnet/core/blob/master/.gitignore
-
-*.swp
-*.*~
-bin/
-obj/
-project.lock.json
-.DS_Store
