@@ -364,14 +364,81 @@ The void return type returns a 204 (No Content) response. That means the client 
 * “Delete” means “ensure the item is not in the collection.” The item is already not in the collection, so return a 204.
 Either approach is reasonable. If you return 404, the client will need to handle that case.
 
+```
+DELETE http://localhost:24822/api/todo/0cbb0134-9233-4fde-bee3-e011681ce6a7 HTTP/1.1
+User-Agent: Fiddler
+Host: localhost:24822
+```
 
+Response:
+```
+HTTP/1.1 200 OK
+Server: Kestrel
+X-SourceFiles: =?UTF-8?B?RDpcR2l0aHViXGpib3lmbGFnYTJcUHJvZ3JhbW1pbmdFeGVyY2lzZXMtQ1NoYXJwXERvdE5ldENvcmVUdXRvcmlhbHNcMjAxNi0wNy0zMV9GaXJzdFdlYkFQSV9Bc3BOZXRDb3JlTXZjX1ZTMjAxNVxUb2RvQXBpXHNyY1xUb2RvQXBpXGFwaVx0b2RvXDBjYmIwMTM0LTkyMzMtNGZkZS1iZWUzLWUwMTE2ODFjZTZhNw==?=
+X-Powered-By: ASP.NET
+Date: Sun, 31 Jul 2016 11:52:16 GMT
+Content-Length: 0
+```
 
+# Creating Tests (NOTE: this is not in the tutorial anymore. You just added it here so that you can experience practicing testing with Controllers and you can test using Moq on .NET Core)
 
+``` JSON
+{
+	"version": "1.0.0-*",
+	"testRunner": "xunit",
 
+	"dependencies": {
+		"Microsoft.NETCore.App": {
+			"type": "platform",
+			"version": "1.0.0"
+		},
+		"xunit": "2.1.0",
+		"dotnet-test-xunit": "1.0.0-*",
+		"Moq": "4.6.36-alpha",
 
+		"TodoApi": "1.0.0-*"
+	},
 
+	"frameworks": {
+		"netcoreapp1.0": {
+			"imports": [
+				"dnxcore50",
+				"portable-net45+win8"
+			]
+		}
+	}
+}
+```
 
+``` C#
+using System;
+using Moq;
+using Xunit;
+using TodoApi.Controllers;
+using TodoApi.Models;
+using Microsoft.AspNetCore.Mvc;
 
+namespace TodoApi.Tests
+{
+	public class TodoControllerTests
+	{
+		[Fact]
+		public void GetById_should_return_NotFound_if_item_with_specified_id_is_not_found()
+		{
+			// arrange
+			var mockTodoRepository = new Mock<ITodoRepository>();
+			var todoController = new TodoController(mockTodoRepository.Object);
+			var nonExistentID = Guid.NewGuid().ToString();
+
+			// act
+			var result = todoController.GetById(nonExistentID);
+
+			// assert
+			Assert.IsType(typeof(NotFoundResult), result);
+		}
+	}
+}
+```
 
 
 
